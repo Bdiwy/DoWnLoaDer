@@ -13,7 +13,7 @@ EOD;
 
 echo $green . $logo . $reset . "\n";
 
-echo $green . "             createdBy=> Bdiwy" . $reset . "\n";
+echo  "             createdBy => $green Bdiwy" . $reset . "\n";
 
 // Function to sanitize the filename
 function sanitizeFilename($filename)
@@ -64,16 +64,18 @@ if (!is_dir($playlist_path) && !mkdir($playlist_path, 0777, true)) {
 }
 
 echo "Downloading: $playlist_name\nSaving to: $playlist_path\n";
-
+showSpinner();
 // Spinner function to show a rotating symbol
-function showSpinner()
+function showSpinner($stop=1)
 {
+    if($stop){
     $spinner = ['|', '/', '-', '\\'];
     $i = 0;
     while (true) {
-        echo "\r" . $spinner[$i % 4] . " Please wait... downloading";
+        echo "\r" .$GLOBALS['green'] . $spinner[$i % 4]. $GLOBALS['reset'] . " Please wait... downloading";
         usleep(200000); // Sleep for 200ms
         $i++;
+        }
     }
 }
 
@@ -97,13 +99,15 @@ if (is_resource($process)) {
     proc_close($process);
 
     // Stop the spinner after download
+    showSpinner(0);
     echo "\rDownload completed.\n";
 
     // Log the output and error messages
     $file_log = $playlist_path . "\\download_errors.log";
     file_put_contents($file_log, $download_output, FILE_APPEND);
-
+    showSpinner(0);
     echo $download_error ? "Error: Download failed. Check logs at '$file_log'.\n" : "Download completed.\n";
 } else {
+    showSpinner(0);
     echo "Failed to start the download process.\n";
 }

@@ -13,7 +13,7 @@ EOD;
 
 echo $green . $logo . $reset . "\n";
 
-echo $green . "             createdByBdiwy" . $reset . "\n";
+echo $green . "             createdBy=> Bdiwy" . $reset . "\n";
 
 // Function to sanitize the filename
 function sanitizeFilename($filename)

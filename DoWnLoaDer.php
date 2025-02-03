@@ -1,5 +1,8 @@
 <?php
 
+$green = "\033[32m";
+$reset = "\033[0m";
+
 $logo = <<<EOD
     ____      _       __      __                ____           
    / __ \____| |     / /___  / /   ____  ____ _/ __ \___  _____
@@ -8,7 +11,9 @@ $logo = <<<EOD
 /_____/\____/|__/|__/_/ /_/_____/\____/\__,_/_____/\___/_/     
 EOD;
 
-echo $logo . "\n";
+echo $green . $logo . $reset . "\n";
+
+echo $green . "             createdByBdiwy" . $reset . "\n";
 
 // Function to sanitize the filename
 function sanitizeFilename($filename)
@@ -60,14 +65,45 @@ if (!is_dir($playlist_path) && !mkdir($playlist_path, 0777, true)) {
 
 echo "Downloading: $playlist_name\nSaving to: $playlist_path\n";
 
-// Download the playlist and capture output
+// Spinner function to show a rotating symbol
+function showSpinner()
+{
+    $spinner = ['|', '/', '-', '\\'];
+    $i = 0;
+    while (true) {
+        echo "\r" . $spinner[$i % 4] . " Please wait... downloading";
+        usleep(200000); // Sleep for 200ms
+        $i++;
+    }
+}
+
+// Start the download process and show the spinner
 $cmd_download = "yt-dlp --no-cache-dir -v --ignore-errors --retries 5 -o \"$playlist_path/%(title)s.%(ext)s\" $playlist_url 2>&1";
-exec($cmd_download, $download_output, $return_var);
+$process = proc_open($cmd_download, [
+    1 => ['pipe', 'w'], // stdout is a pipe
+    2 => ['pipe', 'w'], // stderr is a pipe
+], $pipes);
 
-// Log the output and error messages
-$file_log = $playlist_path . "\\download_errors.log";
-file_put_contents($file_log, implode("\n", $download_output), FILE_APPEND);
+if (is_resource($process)) {
+    // Show spinner while downloading
+    $spinner_pid = shell_exec('php -r "while(true){echo \'.\'; sleep(1);}";'); 
 
-echo $return_var === 0 ? "Download completed.\n" : "Error: Download failed. Check logs at '$file_log'.\n";
+    $download_output = stream_get_contents($pipes[1]);
+    $download_error = stream_get_contents($pipes[2]);
+    
+    // Close the process and pipes
+    fclose($pipes[1]);
+    fclose($pipes[2]);
+    proc_close($process);
 
-?>
+    // Stop the spinner after download
+    echo "\rDownload completed.\n";
+
+    // Log the output and error messages
+    $file_log = $playlist_path . "\\download_errors.log";
+    file_put_contents($file_log, $download_output, FILE_APPEND);
+
+    echo $download_error ? "Error: Download failed. Check logs at '$file_log'.\n" : "Download completed.\n";
+} else {
+    echo "Failed to start the download process.\n";
+}

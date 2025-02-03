@@ -60,8 +60,14 @@ if (!is_dir($playlist_path) && !mkdir($playlist_path, 0777, true)) {
 
 echo "Downloading: $playlist_name\nSaving to: $playlist_path\n";
 
-// Download the playlist
+// Download the playlist and capture output
 $cmd_download = "yt-dlp --no-cache-dir -v --write-errors --ignore-errors --retries 5 -o \"$playlist_path/%(title)s.%(ext)s\" $playlist_url 2>&1";
 exec($cmd_download, $download_output, $return_var);
 
-echo $return_var === 0 ? "Download completed.\n" : "Error: Download failed. Check logs.\n";
+// Log the output and error messages
+$file_log = $playlist_path . "\\download_errors.log";
+file_put_contents($file_log, implode("\n", $download_output), FILE_APPEND);
+
+echo $return_var === 0 ? "Download completed.\n" : "Error: Download failed. Check logs at '$file_log'.\n";
+
+?>

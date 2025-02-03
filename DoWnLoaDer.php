@@ -61,7 +61,7 @@ if (!is_dir($playlist_path) && !mkdir($playlist_path, 0777, true)) {
 echo "Downloading: $playlist_name\nSaving to: $playlist_path\n";
 
 // Download the playlist and capture output
-$cmd_download = "yt-dlp --no-cache-dir -v --write-errors --ignore-errors --retries 5 -o \"$playlist_path/%(title)s.%(ext)s\" $playlist_url 2>&1";
+$cmd_download = "yt-dlp --no-cache-dir -v --ignore-errors --retries 5 -o \"$playlist_path/%(title)s.%(ext)s\" $playlist_url 2>&1";
 exec($cmd_download, $download_output, $return_var);
 
 // Log the output and error messages

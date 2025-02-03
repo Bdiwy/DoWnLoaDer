@@ -51,7 +51,7 @@ If yt-dlp is not installed, download it from the [yt-dlp GitHub page](https://gi
 2. Run the script with a YouTube playlist URL:
 
     ```bash
-    php download_playlist.php "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID"
+    php DoWnLoaDer.php "https://www.youtube.com/playlist?list=YOUR_PLAYLIST_ID"
     ```
 
 ---
